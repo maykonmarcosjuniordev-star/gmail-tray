@@ -1,8 +1,10 @@
 all:
 	rm -rf gmail-tray-*-any.pkg.tar.zst
+	makepkg -g
+	read -p "Press [Enter] to continue after checking the hashes..."
 	makepkg --printsrcinfo > .SRCINFO
 	makepkg -fsirc
-	sudo pacman -U --noconfirm gmail-tray-*-any.pkg.tar.zst
+	sudo pacman -U --noconfirm gmail-tray-*.pkg.tar.zst
 
 commit:
 	makepkg -fsirc
