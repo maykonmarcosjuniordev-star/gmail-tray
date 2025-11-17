@@ -61,3 +61,25 @@ There, you can change:
 *   The path to the gmail-tray icon (to another icon perhaps),
 *   The app's title,
 *   And even the link to open (if you, for some reason, want to open an alternative page instead of gmail)
+
+# Features
+*   [x] Regular email checking
+*   [x] System notifications
+*   [x] Tray icon indication of unread messages
+*   [x] Clicking on tray icon allow opening gmail website on browser
+*   [x] System service to allow autostart
+*   [x] Browser and flags can be added on a config file
+*   [x] User settings on ~/.config/gmail-tray
+*   [x] Multiple emails accounts suppor
+*   [x] Clicking on the desktop app after it started launchs gmail website
+*   [x] Clicking on tray icon display unread count per account
+*   [x] Clicking on tray icon option can also re-launch notifications per account
+*   [x] Full Wayland and Xorg Support
+*   [x] Works on any linux using libnotify
+
+Future
+*   [ ] Make the notifications clickable
+*   [ ] A GUI to allow for customizations
+*   [ ] A GUI to set up fetchmail
+*   [ ] Create a installer file
+*   [ ] Find a prettier icon
