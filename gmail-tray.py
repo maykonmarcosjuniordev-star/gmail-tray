@@ -16,49 +16,6 @@ gi.require_version('AyatanaAppIndicator3', '0.1')
 from gi.repository import AyatanaAppIndicator3 as AppIndicator
 
 
-LOCK_FILE = "/tmp/gmail-tray.lock"
-
-def already_running() -> bool:
-    global lock_fp
-    try:
-        lock_fp = open(LOCK_FILE, 'w')
-        fcntl.flock(lock_fp, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        return False
-    except OSError:
-        return True
-
-def verify_configs() -> str:
-    config_path = os.path.expanduser("~/.config/gmail-tray")
-    config_file = os.path.join(config_path, "gmail-tray-configs.json")
-    if not os.path.exists(config_file):
-        print("Configuration file not found. Creating a new one...")
-        os.makedirs(os.path.dirname(config_file), exist_ok=True)
-        # copies the default config file to the user's home directory
-        default_config = "/usr/share/gmail-tray/gmail-tray-configs.json"
-        if os.path.exists(default_config):
-            print("Copying default configuration file...")
-            with open(default_config, "r") as src, open(config_file, "w") as dst:
-                dst.write(src.read())
-            print("Default configuration file copied.")
-            return config_file
-        else:
-            print("Default configuration file not found. Please create it manually.")
-            exit(1)
-    else:
-        print("Configuration file found.")
-        return config_file
-
-def get_configs(config_file):
-    with open(config_file, "r") as f:
-        configs = json.load(f)
-        return configs
-
-def open_browser(browser, flags, url) -> None:
-    print("Opening browser")
-    print(f"Browser: {browser}, Flags: {flags}, URL: {url}")
-    subprocess.Popen([browser, *flags, url]).wait()
-    print("Browser opened.")
-
 class GenericTrayApp:
     def __init__(self, config_file) -> None:
         self.prev_unread = 0
@@ -180,18 +137,33 @@ class GenericTrayApp:
         print("Displaying users unread counts:")
         for user, unread in self.users:
             print(f"User: {user}, Unread: {unread}")
+            self.get_unread_count()
             self.notify_new_mail(unread, user)
 
     def notify_new_mail(self, count, user=None) -> None:
         print(f"New mail notification: {count} new email(s)")
+        notification_body = f"{count} new Gmail message(s)"
+        delay = "-t 2000"  # 2 seconds
+        if user is not None:
+            notification_body += f" for\n {user}"
+            delay = ""  # wait until closed for user-specific notifications
+
+        # Construct the complete shell command with a pipe
+        command = f"""
+        notify-send -a Gmail -u normal {delay} -i {self.icon} "{notification_body}" --action "OPEN=Open" |
+        if read ACTION_ID; then
+            {self.browser} {" ".join(self.flags)} "{self.url}";
+        fi
+        """
         try:
-            subprocess.run(["notify-send",
-                            "-a", "Gmail",
-                            "-u", "normal",
-                            "-t", "2000",
-                            "-i", self.icon,
-                            f"{count} new Gmail message(s)" if user is None else f"{count} new Gmail message(s) for {user}"
-            ])
+            # run the notify-send command
+            notify_process = subprocess.run(command, shell=True, executable="/bin/bash")
+
+            # Now read the ACTION_ID from the output
+
+            # Check for action ID
+            if notify_process.returncode == 0:
+                print("Notification sent successfully.")
         except FileNotFoundError:
             print("notify-send not found.")
         except Exception as e:
@@ -209,10 +181,48 @@ class GenericTrayApp:
         Gtk.main_quit()
 
 
-def main(config_file) -> None:
-    signal.signal(signal.SIGINT, signal.SIG_DFL)
-    _ = GenericTrayApp(config_file)
-    Gtk.main()
+LOCK_FILE = "/tmp/gmail-tray.lock"
+
+def already_running() -> bool:
+    global lock_fp
+    try:
+        lock_fp = open(LOCK_FILE, 'w')
+        fcntl.flock(lock_fp, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        return False
+    except OSError:
+        return True
+
+def verify_configs() -> str:
+    config_path = os.path.expanduser("~/.config/gmail-tray")
+    config_file = os.path.join(config_path, "gmail-tray-configs.json")
+    if not os.path.exists(config_file):
+        print("Configuration file not found. Creating a new one...")
+        os.makedirs(os.path.dirname(config_file), exist_ok=True)
+        # copies the default config file to the user's home directory
+        default_config = "/usr/share/gmail-tray/gmail-tray-configs.json"
+        if os.path.exists(default_config):
+            print("Copying default configuration file...")
+            with open(default_config, "r") as src, open(config_file, "w") as dst:
+                dst.write(src.read())
+            print("Default configuration file copied.")
+            return config_file
+        else:
+            print("Default configuration file not found. Please create it manually.")
+            exit(1)
+    else:
+        print("Configuration file found.")
+        return config_file
+
+def get_configs(config_file):
+    with open(config_file, "r") as f:
+        configs = json.load(f)
+        return configs
+
+def open_browser(browser, flags, url) -> None:
+    print("Opening browser")
+    print(f"Browser: {browser}, Flags: {flags}, URL: {url}")
+    subprocess.Popen([browser, *flags, url]).wait()
+    print("Browser opened.")
 
 if __name__ == "__main__":
     config_file = verify_configs()
@@ -221,4 +231,6 @@ if __name__ == "__main__":
         configs = get_configs(config_file)
         open_browser(configs["browser"], configs["flags"], configs["url"])
     else:
-        main(config_file)
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
+        _ = GenericTrayApp(config_file)
+        Gtk.main()
