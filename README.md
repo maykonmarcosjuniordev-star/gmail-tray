@@ -8,13 +8,36 @@ It mostly uses [fetchmail](https://www.fetchmail.info) to search for new emails 
 
 Also, you must set it (fetchmail) up first for it to work
 
-## Build from Source
+## Running the repo
+*   This project relies on maskfile to use the readme as a makefile
+*   So you can install mask, and run this README, using: 
+*   mask --maskfile README.md <ready|install|push >
 
-> cd gmail-tray
+## ready
 
-> makepkg -fsirc
+> make sure everything is up to date
 
-> sudo pacman -U gmail-tray-2.0-1-any.pkg.tar.zst
+```sh
+echo "building project..."
+makepkg -g
+read -p "Press [Enter] to continue after checking the hashes..."
+makepkg --printsrcinfo > .SRCINFO
+makepkg -fsrc
+```
+
+## install
+> at the repository root directory
+```sh
+echo "creating and installing the package"
+makepkg -fsirc
+```
+
+## push
+> For me to not forget what I need to sync it with the AUR
+```sh
+git remote add aur ssh://aur@aur.archlinux.org/gmail-tray-git.git
+git push --set-upstream aur master
+```
 
 ## Setting up fetchmail:
 
@@ -38,25 +61,28 @@ Also, you must set it (fetchmail) up first for it to work
         chmod 0600 ~/.fetchmailrc
 
 ## Enable service autostart
-
-> systemctl --user enable --now gmail-tray.service
+```sh
+systemctl --user enable --now gmail-tray.service
+```
 
 ## Uninstall
-
-> sudo pacman -Rns gmail-tray
+```sh
+sudo pacman -Rns gmail-tray
+```
 
 Customizations  
-The user config file is in ~/.config/gmail-tray/gmail-tray-configs.json
+The user config file will be in ~/.config/gmail-tray/gmail-tray-configs.json
 
 There, you can change:
 
 *   The checking interval to run fetchmail,
-*   The browser used to open gmail (to the one you like most),
+*   The browser used to open gmail (to the one you like most, the default is firefox),
 *   The flags used to open the browser
 
-```
- (like --new-tab, --safe-mode (to use without extensions and make it lighter), ...),
-```
+
+> (like:
+    --new-tab,
+    --safe-mode (to use firefox without extensions and make it lighter), ...),
 
 *   The path to the gmail-tray icon (to another icon perhaps),
 *   The app's title,
@@ -66,6 +92,7 @@ There, you can change:
 *   [x] Regular email checking
 *   [x] System notifications
 *   [x] Tray icon indication of unread messages
+    *   Doesn't work natively with waybar
 *   [x] Clicking on tray icon allow opening gmail website on browser
 *   [x] System service to allow autostart
 *   [x] Browser and flags can be added on a config file
@@ -76,10 +103,9 @@ There, you can change:
 *   [x] Clicking on tray icon option can also re-launch notifications per account
 *   [x] Full Wayland and Xorg Support
 *   [x] Works on any linux using libnotify
+*   [x] Make the notifications clickable
 
 Future
-*   [ ] Make the notifications clickable
-*   [ ] A GUI to allow for customizations
-*   [ ] A GUI to set up fetchmail
+*   [ ] A TUI to set up fetchmail
+*   [ ] A TUI to allow for customizations
 *   [ ] Create a installer file
-*   [ ] Find a prettier icon

@@ -1,21 +1,32 @@
 # Maintainer: Maykon Marcos Junior <maykon.marcos.junior.dev@gmail.com>
-pkgname=gmail-tray
-pkgver=2.2 # the software’s upstream version (e.g. 1.0, 1.1)
+pkgname=gmail-tray-git
+pkgbase=gmail-tray-git
+pkgver=1 # the software’s upstream version (e.g. 1.0, 1.1)
 pkgrel=1   # the package release number, change the packaging but not the upstream version
 pkgdesc="Minimal Gmail tray notifier with unread counter"
 # noarch because it is a Python script and desktop files are architecture independent
 arch=('any')
 url="https://github.com/maykonmarcosjuniordev-star/gmail-tray"
 license=('MIT')
-depends=('fetchmail' 'gtk3' 'libnotify' 'python' 'python-gobject' 'json-glib' 'libappindicator-gtk3' 'libayatana-appindicator' 'libayatana-appindicator-glib')
-source=('gmail-tray.py'
-'gmail-tray.desktop'
-'gmail-tray.service'
-'gmail-tray-configs.json'
+depends=('fetchmail'
+          'libnotify'
+          'gtk3'
+          'python'
+          'python-gobject'
+          'json-glib'
+          'libappindicator-gtk3'
+          'libayatana-appindicator'
+          'libayatana-appindicator-glib'
+)
+source=(
+  'gmail-tray.py'
+  'gmail-tray.desktop'
+  'gmail-tray.service'
+  'gmail-tray-configs.json'
   'https://upload.wikimedia.org/wikipedia/commons/archive/7/7e/20201210105307%21Gmail_icon_%282020%29.svg'  # gmail.svg
 )
 # conflicts with gmail-tray and gmail-tray-appimage
-conflicts=('gmail-tray' 'gmail-unread.png')
+conflicts=('gmail-tray' 'gmail-tray-appimage')
 sha256sums=('SKIP'  # gmail-tray.py
             '0688bfaf05bf4f7bbe8a93f9f885e29a29d700b99e37ce942be9013535c720bc'  # gmail-tray.desktop
             'd14eb5fe03ac56e9afb4e469bc44bb14d61433664bb46d0846bffc5e876d3995'  # gmail-tray.service

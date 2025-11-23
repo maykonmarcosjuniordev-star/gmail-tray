@@ -1,16 +1,18 @@
-pkgbase = gmail-tray
+pkgbase = gmail-tray-git
 	pkgdesc = Minimal Gmail tray notifier with unread counter
-	pkgver = 2.2
+	pkgver = 1
 	pkgrel = 1
 	url = https://github.com/maykonmarcosjuniordev-star/gmail-tray
 	arch = any
 	license = MIT
 	depends = fetchmail
-	depends = gtk3
 	depends = libnotify
+	depends = gtk3
 	depends = python
 	depends = python-gobject
 	depends = json-glib
+	depends = libappindicator-gtk3
+	depends = libayatana-appindicator
 	depends = libayatana-appindicator-glib
 	conflicts = gmail-tray
 	conflicts = gmail-tray-appimage
@@ -25,4 +27,4 @@ pkgbase = gmail-tray
 	sha256sums = 76348eec70f407361090a53d3bc96e4e8cae2538ae349e18b4b7b01ced7a8a27
 	sha256sums = SKIP
 
-pkgname = gmail-tray
+pkgname = gmail-tray-git
