@@ -12,6 +12,35 @@ My main job was create an interface and set up the polling code,
 
 Also, you must set it (fetchmail) up first for it to work
 
+# Table of Contents
+*   [Features](README.md#features)
+*   [Running this Repo](README.md#running-the-repo)
+*   [Getting Started with Fetchmail](README.md#setting-up-fetchmail)
+*   [Customizations](README.md#customizations)
+*   [SNI (waybar) Support](README.md#sni-waybar-support)
+
+
+# Features
+*   [x] Regular email checking
+*   [x] System notifications
+*   [x] Tray icon indication of unread messages
+    *   Doesn't work natively with waybar, see ahead
+*   [x] Clicking on tray icon allow opening gmail website on browser
+*   [x] System service to allow autostart
+*   [x] Browser and flags can be added on a config file
+*   [x] User settings on ~/.config/gmail-tray
+*   [x] Multiple emails accounts suppor
+*   [x] Clicking on the desktop app after it started launchs gmail website
+*   [x] Clicking on tray icon display unread count per account
+*   [x] Clicking on tray icon option can also re-launch notifications per account
+*   [x] Full Wayland and Xorg Support
+*   [x] Works on any linux using libnotify
+*   [x] Make the notifications clickable
+
+In the Future
+*   [ ] A TUI to set up fetchmail
+*   [ ] A TUI to allow for customizations
+
 ## Running the repo
 *   This project relies on [maskfile](https://github.com/jacobdeichert/mask) to use the readme as a makefile
 *   So you can install mask, and run this README, using: 
@@ -34,9 +63,9 @@ alias maskrun='mask --maskfile README.md'
 ```sh
 # defaults to false
 HASH=${hash_is_done:-false}
-
+echo "Skipping Hash = $HASH"
 echo "building project..."
-if [[ ! $HASH ]]; then
+if [[ !$HASH ]]; then
     makepkg -g
     read -p "Press [Enter] to continue after checking the hashes..."
 fi
@@ -127,23 +156,41 @@ There, you can change:
 *   The app's title,
 *   And even the link to open (if you want to open outlook for instance)
 
-# Features
-*   [x] Regular email checking
-*   [x] System notifications
-*   [x] Tray icon indication of unread messages
-    *   Doesn't work natively with waybar
-*   [x] Clicking on tray icon allow opening gmail website on browser
-*   [x] System service to allow autostart
-*   [x] Browser and flags can be added on a config file
-*   [x] User settings on ~/.config/gmail-tray
-*   [x] Multiple emails accounts suppor
-*   [x] Clicking on the desktop app after it started launchs gmail website
-*   [x] Clicking on tray icon display unread count per account
-*   [x] Clicking on tray icon option can also re-launch notifications per account
-*   [x] Full Wayland and Xorg Support
-*   [x] Works on any linux using libnotify
-*   [x] Make the notifications clickable
+## (SNI) Waybar support
 
-Future
-*   [ ] A TUI to set up fetchmail
-*   [ ] A TUI to allow for customizations
+Waybar’s tray module (SNI/StatusNotifierItem) displays:
+- The icon
+- The name
+- NOT the dynamic label (the unread count this program use).
+
+This is a known limitation of:
+- KDE/Qt SNI spec
+- waybar's implementation
+- many modern trays in Wayland
+
+Therefore, there is a hack to inclue a unread counter on waybar:
+
+*   Add this to `~/.config/waybar/config.jsonc`
+```jsonc
+"custom/gmail": {
+    "exec": "gmail-tray --once | grep '{'",
+    "interval": 30,
+    "return-type": "json",
+    "format": " @ {} "
+},
+```
+*   Don't forget to enable the module (I recommend putting it right before the tray icons)
+```jsonc
+    "modules-right": [
+        "tray",
+        "custom/gmail",
+        ...
+    ],
+```
+* Then, customize the module as you want, adding to `~/.config/waybar/styles.css`:
+```css
+#custom-gmail {
+    padding: 0 10px;
+    color: #ffffff;
+}
+```

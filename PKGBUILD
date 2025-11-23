@@ -27,11 +27,11 @@ source=(
 )
 # conflicts with gmail-tray and gmail-tray-appimage
 conflicts=('gmail-tray' 'gmail-tray-appimage')
-sha256sums=('SKIP'  # gmail-tray.py
+sha256sums=('a709f594eaa8ac8220665e616d39c15f4b07c7e721b1b676185c82fa74011408'  # gmail-tray.py
             '0688bfaf05bf4f7bbe8a93f9f885e29a29d700b99e37ce942be9013535c720bc'  # gmail-tray.desktop
             'd14eb5fe03ac56e9afb4e469bc44bb14d61433664bb46d0846bffc5e876d3995'  # gmail-tray.service
-            '76348eec70f407361090a53d3bc96e4e8cae2538ae349e18b4b7b01ced7a8a27'  # gmail-tray-configs.json
-            'SKIP'  # gmail.svg
+            '07aaa2378095bbdb37dc36ce6e480b2ce20f73fe148e6f7df1e5e41ad18f2e9d'  # gmail-tray-configs.json
+            '7b6c2b6e3b67271a2a27e11986265745de3ffe8e84f692be79f6f554ac405275'  # gmail.svg
            )
 install=
 package() {

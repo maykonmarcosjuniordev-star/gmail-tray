@@ -17,7 +17,7 @@ from gi.repository import AyatanaAppIndicator3 as AppIndicator
 
 
 class GenericTrayApp:
-    def __init__(self, config_file) -> None:
+    def __init__(self, config_file, waybar=False) -> None | int:
         self.prev_unread = 0
         # get the variables from the gmail-tray-configs.json file
         try:
@@ -31,12 +31,19 @@ class GenericTrayApp:
         except Exception as e:
             print("Error reading configuration file:", e)
             return None
+        self.users = []
+        if waybar:
+            unread = self.get_unread_count()
+            print(json.dumps({
+                "text": str(unread),
+                "tooltip": "Unread Gmail messages",
+            }))
+            return None
         self.indicator = AppIndicator.Indicator.new(
             self.title,
             self.icon,
             AppIndicator.IndicatorCategory.APPLICATION_STATUS
         )
-        self.users = []
         self.indicator.set_status(AppIndicator.IndicatorStatus.ACTIVE)
         self.indicator.set_menu(self.build_menu())
         self.update_label()
@@ -226,6 +233,12 @@ def open_browser(browser, flags, url) -> None:
 
 if __name__ == "__main__":
     config_file = verify_configs()
+    import sys
+    if "--once" in sys.argv:
+        print()
+        config_file = verify_configs()
+        _ = GenericTrayApp(config_file, True)
+        sys.exit(0)
     if already_running():
         print("Gmail Tray is already running.")
         configs = get_configs(config_file)
