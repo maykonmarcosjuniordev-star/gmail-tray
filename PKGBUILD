@@ -7,7 +7,7 @@ pkgdesc="Minimal Gmail tray notifier with unread counter"
 arch=('any')
 url="https://github.com/maykonmarcosjuniordev-star/gmail-tray"
 license=('MIT')
-depends=('fetchmail' 'gtk3' 'libnotify' 'python' 'python-gobject' 'json-glib' 'libayatana-appindicator-glib')
+depends=('fetchmail' 'gtk3' 'libnotify' 'python' 'python-gobject' 'json-glib' 'libappindicator-gtk3' 'libayatana-appindicator' 'libayatana-appindicator-glib')
 source=('gmail-tray.py' 'gmail-tray.desktop' 'gmail-tray.service' 'gmail-tray-configs.json' 'gmail.png' 'gmail-unread.png')
 sha256sums=('SKIP'  # gmail-tray.py
             '0688bfaf05bf4f7bbe8a93f9f885e29a29d700b99e37ce942be9013535c720bc'  # gmail-tray.desktop
