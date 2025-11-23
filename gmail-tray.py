@@ -112,7 +112,7 @@ class GenericTrayApp:
         try:
             output = subprocess.run(["fetchmail", "-c"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL).stdout
             output = output.decode().strip().splitlines()
-            print("Output from fetchmail:\n", output)
+            print("Output from fetchmail:", "\n".join(output), sep="\n")
             total_unread = 0
             for u, line in enumerate(output):
                 user = line.strip().split()[-3]
@@ -157,18 +157,19 @@ class GenericTrayApp:
         print("previous unread count:", self.prev_unread)
         try:
             count = self.get_unread_count()
-            if count > self.prev_unread:
-                print(f"New unread msgs: {count} (previous: {self.prev_unread})")
-                threading.Thread(target=self.notify_new_mail, args=(count,)).start()
-            self.prev_unread = count
+            # changes the icon if there are unread emails
+            if count > 0:
+                self.indicator.set_status(AppIndicator.IndicatorStatus.ATTENTION)
+                if count > self.prev_unread:
+                    print(f"New unread msgs: {count} (previous: {self.prev_unread})")
+                    threading.Thread(target=self.notify_new_mail, args=(count,)).start()
+            else:
+                self.indicator.set_status(AppIndicator.IndicatorStatus.ACTIVE)
             print("Current unread count:", self.prev_unread)
+            self.prev_unread = count
             label = f"{self.prev_unread}"
             self.indicator.set_label(label, self.title)
             self.indicator.set_menu(self.build_menu())
-            # changes the icon if there are unread emails
-            if self.prev_unread > 0:
-                self.indicator.set_icon("gmail-tray-unread")
-                self.indicator.set_status(AppIndicator.IndicatorStatus.ATTENTION)
             return True
         except Exception as e:
             print("Erro em update_label-->", e)

@@ -197,3 +197,5 @@ src/
 *.tar.*.gz
 *.zip
 *.tar.zst
+*.svg
+*.png
