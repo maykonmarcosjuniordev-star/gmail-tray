@@ -2,75 +2,113 @@
 
 Minimal Gmail notifier, with tray-icon, unread counter, opening the gmail page on a browser (firefox).
 
-It mostly uses [fetchmail](https://www.fetchmail.info) to search for new emails and notify you, so you the main credits go for it's creator
+It mostly uses [fetchmail](https://www.fetchmail.info) to search for new emails and notify you,
+- so you the main credits go for it's creator
 
-*   My main job was create an interface and set up the polling code, so that it checks for emails on terminal, notifies the user and update the unread emails count
+My main job was create an interface and set up the polling code,
+- so that it checks for emails on terminal,
+- notifies the user
+- and update the unread emails count
 
 Also, you must set it (fetchmail) up first for it to work
 
 ## Running the repo
-*   This project relies on maskfile to use the readme as a makefile
+*   This project relies on [maskfile](https://github.com/jacobdeichert/mask) to use the readme as a makefile
 *   So you can install mask, and run this README, using: 
-*   mask --maskfile README.md <ready|install|push >
+*   mask --maskfile README.md <command>
+I recommend adding
+```sh
+alias maskrun='mask --maskfile README.md'
+```
+*   to your .bash_aliases or .zsh_aliases
 
 ## ready
-
 > make sure everything is up to date
 
+**OPTIONS**
+* hash_is_done
+    * flags: --skip
+    * type: boolean
+    * desc: wheter to verify the hashes for PKBUILD
+
 ```sh
+# defaults to false
+HASH=${hash_is_done:-false}
+
 echo "building project..."
-makepkg -g
-read -p "Press [Enter] to continue after checking the hashes..."
+if [[ ! $HASH ]]; then
+    makepkg -g
+    read -p "Press [Enter] to continue after checking the hashes..."
+fi
 makepkg --printsrcinfo > .SRCINFO
 makepkg -fsrc
 ```
 
 ## install
+0nly arch linux supported for now:
+
+for the AUR [pkg](https://aur.archlinux.org/packages/gmail-tray-git)
+- yay -S gmail-tray-git
+- paru -S gmail-tray-git
+
+Or, for manual install:
 > at the repository root directory
 ```sh
 echo "creating and installing the package"
 makepkg -fsirc
 ```
 
-## push
-> For me to not forget what I need to sync it with the AUR
-```sh
-git remote add aur ssh://aur@aur.archlinux.org/gmail-tray-git.git
-git push --set-upstream aur master
-```
-
-## Setting up fetchmail:
-
-*   Create an app password (you need to have 2-Factor Authentication)
-    *   Go to: [https://myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
-    *   Type Gmail-Tray > Create
-    *   Note it down
-*   Edit the .fetchmailrc file (create it on your home folder)
-    *   Make it like:
-        *   # account 1
-            poll imap.gmail.com with proto IMAP  
-               user \<your gmail 1 here>@gmail.com password \<"Your App Password 1 between quotes">  
-               ssl
-            # account 2
-            poll imap.gmail.com with proto IMAP  
-               user \<your gmail 2 here>@gmail.com password \<"Your App Password 2 between quotes">  
-               ssl
-            
-
-    Then:
-        chmod 0600 ~/.fetchmailrc
-
-## Enable service autostart
+## autostart
+> Enables an autostart service, that runs on PC startup and ensures it recovers from crashes
 ```sh
 systemctl --user enable --now gmail-tray.service
 ```
 
-## Uninstall
+## remove
+> Uninstalls from the system, whether in a manual or aided install
 ```sh
 sudo pacman -Rns gmail-tray
 ```
 
-Customizations  
+## push (repo)
+> For me to not forget what I need to sync it with the AUR
+```sh
+echo "Pushing to $repo"
+if [[ "$repo" -eq "github" ]]; then
+    git remote add github git@github.com:maykonmarcosjuniordev-star/gmail-tray.git
+    git push --set-upstream github master
+else
+    git remote add aur ssh://aur@aur.archlinux.org/gmail-tray-git.git
+    git push --set-upstream aur master
+fi
+```
+<br>
+<br>
+<br>
+
+# Setting up fetchmail:
+
+Create an app password (you need to have 2-Factor Authentication)
+
+*   Go to: [https://myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
+*   Give it a name 
+*   Tap **Create**
+*   Note it down and save
+*   create a file named **.fetchmailrc** in your home folder
+*   Edit the .fetchmailrc file to add your desired accounts:
+    *   poll imap.gmail.com with proto IMAP  
+           user \<your gmail 1 here>@gmail.com password \<"Your App Password 1 between quotes">  
+           ssl
+    *   poll imap.gmail.com with proto IMAP  
+           user \<your gmail 2 here>@gmail.com password \<"Your App Password 2 between quotes">  
+           ssl
+*   Then:
+```sh
+chmod 0600 ~/.fetchmailrc
+```
+
+# Customizations
+
 The user config file will be in ~/.config/gmail-tray/gmail-tray-configs.json
 
 There, you can change:
@@ -79,14 +117,15 @@ There, you can change:
 *   The browser used to open gmail (to the one you like most, the default is firefox),
 *   The flags used to open the browser
 
-
-> (like:
-    --new-tab,
-    --safe-mode (to use firefox without extensions and make it lighter), ...),
+    *   --ProfileManager (on firefox, it allows for picking a profile),
+    *   --new-tab (to avoid a new instance),
+    *   -P <profile-name> (choose an specific profile)
+    *   --safe-mode (to use firefox without extensions and make it lighter),
+    *   ...
 
 *   The path to the gmail-tray icon (to another icon perhaps),
 *   The app's title,
-*   And even the link to open (if you, for some reason, want to open an alternative page instead of gmail)
+*   And even the link to open (if you want to open outlook for instance)
 
 # Features
 *   [x] Regular email checking
@@ -108,4 +147,3 @@ There, you can change:
 Future
 *   [ ] A TUI to set up fetchmail
 *   [ ] A TUI to allow for customizations
-*   [ ] Create a installer file
