@@ -1,6 +1,6 @@
 {
     "url": "https://mail.google.com",
-    "icon": "/usr/share/icons/hicolor/48x48/apps/gmail-tray",
+    "icon": "gmail-tray",
     "title": "Gmail-Tray",
     "interval": 30,
     "browser": "firefox",
